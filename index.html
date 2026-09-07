@@ -51,7 +51,6 @@
 <link rel="stylesheet" href="css/course.css">
 <link rel="stylesheet" href="css/rich-editor.css">
 <link rel="stylesheet" href="css/video-player.css">
-<link rel="stylesheet" href="exam/exam.css">
 <link rel="stylesheet" href="css/static.css">
 <link rel="stylesheet" href="css/profile.css">
 <link rel="stylesheet" href="css/auth.css">
@@ -147,19 +146,16 @@
         <div class="media-tabs">
           <button class="media-tab active" id="tab-video">Video</button>
           <button class="media-tab" id="tab-slides">Slides</button>
-          <button class="media-tab" id="tab-exam">Exam</button>
         </div>
         <div class="media-body">
           <div id="video-panel">
             <div class="lesson-desc rte-content" id="lesson-desc"></div>
-            <div id="lesson-exam-banner"></div>
             <div class="complete-bar">
               <span class="muted" style="font-size:0.85rem">Mark when the lesson is finished</span>
               <button class="btn btn-primary" id="complete-btn">Mark Lesson as Complete</button>
             </div>
           </div>
           <div id="slide-panel" class="hidden"></div>
-          <div id="exam-panel" class="hidden"></div>
         </div>
       </div>
 
@@ -173,53 +169,6 @@
       </aside>
     </main>
 
-  <div data-footer></div>
-  </div>
-
-  <!-- ===== EXAM SECTION (SPA rendered here) =====
-       Markup lives directly in this shell (mirroring page-course above),
-       but every bit of exam-section CSS/JS itself is organized into its
-       own top-level /exam folder (exam.css, exam.js + exam-*.js modules) —
-       kept separate from the rest of the site's css/js folders.
-       previously exam.html, now removed — this route no longer exists as
-       its own HTML file at all.
-       Flow for #/exam?id=xxx: exam-list-view → exam-verify-view
-       (verification checklist + rules gate) → exam-take-view → exam-result-view. -->
-  <div id="page-exam" class="hidden exam-shell">
-    <main class="container">
-      <div id="exam-list-view">
-        <div class="section-head mt-24">
-          <div>
-            <button type="button" id="exam-back-btn" class="exs-back-btn hidden"><i class="fa-solid fa-arrow-left"></i> কোর্স তালিকা</button>
-            <h2 id="exam-section-title">নিজেকে যাচাই করুন</h2>
-            <p id="exam-section-sub">প্রতিটি কোর্সের জন্য এক্সাম দিন, নিজের স্কোর দেখুন</p>
-          </div>
-        </div>
-        <div class="exam-grid" id="exam-grid"></div>
-      </div>
-
-      <div id="exam-verify-view" class="exs-verify-wrap hidden"></div>
-
-      <div id="exam-take-view" class="exam-take-wrap hidden">
-        <div class="exam-sticky-bar">
-          <div class="exam-top-bar">
-            <h2 id="exam-take-title">Exam</h2>
-            <div class="exam-timer" id="exam-timer"><i class="fa-solid fa-stopwatch"></i><span class="exam-timer-value">00:00</span></div>
-          </div>
-          <div class="q-progress-track"><div class="q-progress-fill" id="q-progress-fill"></div></div>
-        </div>
-        <form id="exam-submit-form">
-          <div id="question-area"></div>
-          <div class="exam-nav-row">
-            <button type="button" class="btn btn-outline" id="q-prev"><i class="fa-solid fa-arrow-left"></i> আগের</button>
-            <button type="button" class="btn btn-primary" id="q-next">পরের <i class="fa-solid fa-arrow-right"></i></button>
-            <button type="submit" class="btn btn-teal hidden" id="q-submit">এক্সাম জমা দিন</button>
-          </div>
-        </form>
-      </div>
-
-      <div id="exam-result-view" class="exam-take-wrap hidden"></div>
-    </main>
   <div data-footer></div>
   </div>
 

@@ -8,7 +8,7 @@
 //                    Firestore নিজেই IndexedDB-তে ডেটা রাখে)
 // ==========================================================================
 
-const CACHE_NAME = "techversecourse-v01.00.26";
+const CACHE_NAME = "techversecourse-v01.00.27";
 
 /* ── নিজের ফাইল (app shell) ── */
 const SHELL_FILES = [
@@ -49,16 +49,6 @@ const SHELL_FILES = [
   "js/flashcards.js",
   "js/admin.js",
   "js/error.js",
-
-  /* Exam section — its own dedicated folder (CSS + JS modules) */
-  "exam/exam.css",
-  "exam/exam.js",
-  "exam/exam-data.js",
-  "exam/exam-engine.js",
-  "exam/exam-guard.js",
-  "exam/exam-render.js",
-  "exam/exam-timer.js",
-  "exam/exam-pdf.js",
 
   /* JS page renderers */
   "js/page-login.js",
