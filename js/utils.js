@@ -14,6 +14,13 @@ import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com
 export const SUPPORT_EMAIL_GMAIL = "tv.support.info@gmail.com";
 export const SUPPORT_EMAIL_YAHOO = "info.techverse@yahoo.com";
 
+/* ---------- Exam portal ----------
+   The "Exam" nav item doesn't live inside this SPA — it hands off to the
+   separate tvexam.vercel.app app. Kept as one constant so the URL only
+   ever needs updating in one place (see showExamVerificationGate() below
+   and the "exam" entry in initNav()'s baseLinks). ---------- */
+export const EXAM_PORTAL_URL = "https://tvexam.vercel.app/";
+
 export function supportMailto(address) {
   const subject = "Support Request - Tech Verse Course";
   const body = "Hello Tech Verse Course Support Team,\n\nDetails:\n\n\nThank you,";
@@ -167,6 +174,79 @@ function showSuspendedGate() {
   document.body.style.overflow = "hidden";
 }
 
+/* ---------- Exam portal handoff gate ----------
+   Shown the instant "Exam" is tapped in the nav (desktop pill or the mobile
+   slider panel), instead of navigating straight to tvexam.vercel.app. Every
+   moving part — the spinning rings, the scan sweep, the checkmark draw, the
+   progress fill, the title swap — is driven purely by CSS keyframes (see
+   the "Exam verification gate" block in css/base.css); this function only
+   mounts the markup and times the final redirect so it lines up with when
+   those keyframes finish. Cancelling just tears the overlay down again. */
+const EXAM_GATE_DURATION_MS = 2600;
+
+function showExamVerificationGate(targetUrl) {
+  if (document.getElementById("exam-verify-overlay")) return;
+
+  const overlay = document.createElement("div");
+  overlay.id = "exam-verify-overlay";
+  overlay.className = "exam-verify-overlay";
+  overlay.innerHTML = `
+    <div class="exam-verify-card" role="status" aria-live="polite">
+      <div class="exam-verify-orbit">
+        <span class="exam-verify-ring exam-verify-ring-1"></span>
+        <span class="exam-verify-ring exam-verify-ring-2"></span>
+        <div class="exam-verify-badge">
+          <i class="fa-solid fa-shield-halved exam-verify-badge-icon"></i>
+          <svg class="exam-verify-check" viewBox="0 0 52 52" aria-hidden="true">
+            <circle class="exam-verify-check-circle" cx="26" cy="26" r="23" fill="none"/>
+            <path class="exam-verify-check-mark" fill="none" d="M14 27l7 7 17-17"/>
+          </svg>
+          <span class="exam-verify-scan"></span>
+        </div>
+      </div>
+      <div class="exam-verify-text">
+        <h3 class="exam-verify-title">
+          <span class="exam-verify-title-step exam-verify-title-step-1">Verifying access</span>
+          <span class="exam-verify-title-step exam-verify-title-step-2">Access granted</span>
+        </h3>
+        <p class="exam-verify-sub">Taking you to the Exam portal…</p>
+      </div>
+      <div class="exam-verify-progress"><div class="exam-verify-progress-bar"></div></div>
+      <div class="exam-verify-dots"><span></span><span></span><span></span></div>
+      <button type="button" class="exam-verify-cancel" id="exam-verify-cancel-btn">Cancel</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.body.style.overflow = "hidden";
+
+  let settled = false;
+  const finish = () => {
+    if (settled) return;
+    settled = true;
+    window.location.href = targetUrl;
+  };
+  const cancel = () => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(redirectTimer);
+    overlay.remove();
+    document.body.style.overflow = "";
+  };
+
+  const redirectTimer = setTimeout(finish, EXAM_GATE_DURATION_MS);
+  overlay.querySelector("#exam-verify-cancel-btn").addEventListener("click", cancel);
+  document.addEventListener(
+    "keydown",
+    function escToCancel(e) {
+      if (e.key === "Escape") {
+        cancel();
+        document.removeEventListener("keydown", escToCancel);
+      }
+    },
+    { once: true }
+  );
+}
+
 /* ---------- Presence heartbeat ----------
    Writes users/{uid}.lastActive so the admin panel can show who's online
    right now. Fires immediately on login, then on an interval, then again
@@ -299,6 +379,10 @@ export function initNav(activePage = "") {
     { href: homeHref, label: '<i class="fa-solid fa-house"></i> Home', key: "home" },
     { href: myCoursesHref, label: '<i class="fa-solid fa-book-open"></i> My Courses', key: "mycourses" },
     { href: hubHref, label: `<i class="fa-solid fa-layer-group"></i> Hub ${newPillHtml("hub_nav")}`, key: "hub" },
+    // Hands off to the separate tvexam.vercel.app app — intercepted below (see
+    // the "a[data-key='exam']" click handler) so it shows the verification
+    // gate first instead of navigating straight away.
+    { href: EXAM_PORTAL_URL, label: '<i class="fa-solid fa-graduation-cap"></i> Exam', key: "exam" },
     { href: profileHref, label: '<i class="fa-solid fa-user"></i> Profile', key: "profile" },
   ];
   const navLinksDesktop = document.getElementById("nav-links");
@@ -360,7 +444,10 @@ export function initNav(activePage = "") {
   function render(isAdmin, userInfo) {
     const links = linksFor(isAdmin);
     const linkHtml = links
-      .map((l) => `<a href="${l.href}" class="${l.key === activePage ? "active" : ""} ${l.key === "admin" ? "nav-link-admin" : ""}">${l.label}</a>`)
+      .map(
+        (l) =>
+          `<a href="${l.href}" data-key="${l.key}" class="${l.key === activePage ? "active" : ""} ${l.key === "admin" ? "nav-link-admin" : ""} ${l.key === "exam" ? "nav-link-exam" : ""}">${l.label}</a>`
+      )
       .join("");
 
     if (navLinksDesktop) {
@@ -426,6 +513,17 @@ export function initNav(activePage = "") {
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") { closeUserDropdown(); closeMobilePanel(); }
+  });
+
+  // Intercept the "Exam" link everywhere it's rendered (desktop pill nav +
+  // the mobile slider panel share the same linkHtml) and show the pure-CSS
+  // verification gate before handing off to tvexam.vercel.app.
+  document.addEventListener("click", (e) => {
+    const examLink = e.target.closest('a[data-key="exam"]');
+    if (!examLink) return;
+    e.preventDefault();
+    closeMobilePanel();
+    showExamVerificationGate(examLink.href || EXAM_PORTAL_URL);
   });
 
   onAuthStateChanged(auth, async (user) => {
