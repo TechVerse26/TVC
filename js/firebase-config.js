@@ -11,15 +11,15 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
-// For Firebase JS SDK v7.20.0 and later, measurementId
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyA7Bzpu_RPI8wqIkSqjmh4aXFK_ARXC88g",
-  authDomain: "tv-course.firebaseapp.com",
-  projectId: "tv-course",
-  storageBucket: "tv-course.firebasestorage.app",
-  messagingSenderId: "394638935623",
-  appId: "1:394638935623:web:af274fe9001abfa9771362",
-  measurementId: "G-VF48BD7CFS"
+  apiKey: "AIzaSyA33aia52cAM2n-W6IvuaTdBtdcy0xh-qQ",
+  authDomain: "tvsaccount.firebaseapp.com",
+  projectId: "tvsaccount",
+  storageBucket: "tvsaccount.firebasestorage.app",
+  messagingSenderId: "923190024339",
+  appId: "1:923190024339:web:fede554f57feac35e91566",
+  measurementId: "G-GXJR3YEBMS"
 };
 
 export const app = initializeApp(firebaseConfig);
